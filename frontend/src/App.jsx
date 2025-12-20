@@ -1,18 +1,7 @@
-// src/App.jsx
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ThemeToggle from "./components/ThemeToggle";
 import ChatPanel from "./components/ChatPanel";
 import PlanPanel from "./components/PlanPanel";
-
-/**
- * Simple hackathon-ready prototype shell.
- * - Left: Chat input + message history (mock)
- * - Right: Plan preview (mock)
- *
- * Later you can:
- * - Replace mockPlan with backend /plan response
- * - Add animations (framer-motion) inside panels
- * - Add store cards, filters, copy/export, etc.
- */
 
 const MOCK_PLAN = {
   dish: "Chocolate chip cookies",
@@ -55,17 +44,37 @@ export default function App() {
         "Tell me what you want to cook or bake. I’ll generate an ingredient list, then split items across stores if needed.",
     },
   ]);
-
   const [input, setInput] = useState("");
-  const [status, setStatus] = useState("idle"); // 'idle' | 'loading' | 'done' | 'error'
+  const [status, setStatus] = useState("idle"); // idle | loading | done | error
   const [plan, setPlan] = useState(null);
+
+  /* ------------------ Theme state ------------------ */
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark" || saved === "light") return saved;
+    return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches
+      ? "dark"
+      : "light";
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((t) => (t === "dark" ? "light" : "dark"));
+  }
+  /* ------------------------------------------------- */
 
   const canSend = input.trim().length > 0 && status !== "loading";
 
-  const headerSubtitle = useMemo(() => {
-    if (status === "loading") return "Generating plan…";
+  const statusLabel = useMemo(() => {
+    if (status === "loading") return "Generating…";
     if (status === "done") return "Plan ready";
-    if (status === "error") return "Something went wrong";
+    if (status === "error") return "Error";
     return "Mock mode";
   }, [status]);
 
@@ -78,20 +87,13 @@ export default function App() {
     setStatus("loading");
 
     try {
-      // TODO (later): replace with real backend call
-      // const res = await fetch("http://localhost:8000/plan", { method:"POST", headers:{...}, body: JSON.stringify({ text }) })
-      // const data = await res.json()
-
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 550));
       const data = MOCK_PLAN;
 
       setPlan(data);
       setMessages((m) => [
         ...m,
-        {
-          role: "assistant",
-          text: `Got it. Here’s a shopping plan for “${data.dish}”.`,
-        },
+        { role: "assistant", text: `Plan generated for “${data.dish}”. See the plan panel →` },
       ]);
       setStatus("done");
     } catch (e) {
@@ -105,104 +107,142 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 text-white">
+    <div
+      className="
+        min-h-screen w-full
+        bg-gradient-to-b from-slate-50 via-white to-slate-50
+        text-slate-900
+        dark:from-[#070A12] dark:via-[#0B1020] dark:to-[#070A12]
+        dark:text-white
+      "
+    >
       {/* Top bar */}
-      <header className="border-b border-white/10 bg-black/20 backdrop-blur">
+      <header
+        className="
+          sticky top-0 z-20 border-b
+          border-slate-200/70 bg-white/70 backdrop-blur
+          dark:border-white/10 dark:bg-black/40
+        "
+      >
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <h1 className="text-lg font-semibold tracking-tight">BuyList</h1>
-            <p className="text-xs text-white/60 mt-1">
-              LLM generates ingredients once • backend decides stores deterministically •{" "}
-              <span className="text-white/70">{headerSubtitle}</span>
+            <p className="text-xs text-slate-600 mt-1 dark:text-white/60">
+              LLM decides ingredients once • backend picks stores deterministically
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <span
               className={[
-                "text-xs px-2 py-1 rounded-full border",
+                "text-xs px-2.5 py-1 rounded-full border",
                 status === "loading"
-                  ? "border-indigo-400/30 bg-indigo-500/10 text-indigo-100"
+                  ? "border-indigo-300 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300"
                   : status === "done"
-                    ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
                     : status === "error"
-                      ? "border-rose-400/30 bg-rose-500/10 text-rose-100"
-                      : "border-white/10 bg-white/5 text-white/70",
+                      ? "border-rose-300 bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300"
+                      : "border-slate-200 bg-slate-50 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60",
               ].join(" ")}
             >
-              {status}
+              {statusLabel}
             </span>
+
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
         </div>
       </header>
 
-      {/* Main layout */}
       <main className="mx-auto max-w-6xl px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <section className="lg:col-span-5 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <h2 className="text-sm font-semibold">Chat</h2>
-              <p className="text-xs text-white/60 mt-1">
-                Type a dish request. We’ll mock the response for now.
-              </p>
-            </div>
+        {/* Chat */}
+        <section
+          className="
+            lg:col-span-5 rounded-2xl border
+            border-slate-200 bg-white shadow-sm
+            dark:border-white/10 dark:bg-white/5
+          "
+        >
+          <div className="p-4 border-b border-slate-100 dark:border-white/10">
+            <h2 className="text-sm font-semibold">Chat</h2>
+            <p className="text-xs text-slate-600 mt-1 dark:text-white/60">
+              Type a dish request. We’ll mock the response for now.
+            </p>
           </div>
 
-          <ChatPanel messages={messages} />
+          <div className="p-4">
+            <ChatPanel messages={messages} />
 
-          <div className="mt-4">
-            <label className="block text-xs text-white/60 mb-2">
-              Request (chatbot input)
-            </label>
+            <div className="mt-4">
+              <label className="block text-xs text-slate-600 mb-2 dark:text-white/60">
+                Request (chatbot input)
+              </label>
 
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              rows={3}
-              placeholder={`Examples:
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                rows={3}
+                placeholder={`Examples:
 - "I want to bake a cake"
 - "Make tacos for 4"
 - "High-protein smoothie"`}
-              className="w-full rounded-xl bg-black/30 border border-white/10 px-3 py-3 text-sm outline-none focus:border-indigo-400/60 focus:ring-4 focus:ring-indigo-500/10 resize-none"
-              onKeyDown={(e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-            />
+                className="
+                  w-full rounded-xl px-3 py-3 text-sm outline-none resize-none
+                  bg-white border border-slate-200
+                  focus:border-indigo-300 focus:ring-4 focus:ring-indigo-200/50
+                  dark:bg-black/30 dark:border-white/10 dark:text-white
+                  dark:focus:border-indigo-400/60 dark:focus:ring-indigo-500/10
+                "
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+              />
 
-            <div className="mt-2 flex items-center justify-between">
-              <p className="text-xs text-white/50">
-                Ctrl/⌘ + Enter to send
-              </p>
-              <button
-                onClick={handleSend}
-                disabled={!canSend}
-                className="rounded-xl px-4 py-2 text-sm font-medium bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              >
-                {status === "loading" ? "Generating…" : "Send"}
-              </button>
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-xs text-slate-500 dark:text-white/50">
+                  Ctrl/⌘ + Enter to send
+                </p>
+                <button
+                  onClick={handleSend}
+                  disabled={!canSend}
+                  className="
+                    rounded-xl px-4 py-2 text-sm font-medium text-white
+                    bg-indigo-600 hover:bg-indigo-700
+                    disabled:opacity-50 disabled:cursor-not-allowed transition
+                  "
+                >
+                  {status === "loading" ? "Generating…" : "Send"}
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="lg:col-span-7 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <h2 className="text-sm font-semibold">Plan Output</h2>
-              <p className="text-xs text-white/60 mt-1">
-                This panel will later show store cards, missing items, totals, and export actions.
-              </p>
-            </div>
+        {/* Plan */}
+        <section
+          className="
+            lg:col-span-7 rounded-2xl border
+            border-slate-200 bg-white shadow-sm
+            dark:border-white/10 dark:bg-white/5
+          "
+        >
+          <div className="p-4 border-b border-slate-100 dark:border-white/10">
+            <h2 className="text-sm font-semibold">Plan Output</h2>
+            <p className="text-xs text-slate-600 mt-1 dark:text-white/60">
+              Later: store cards, missing items, totals, export, and animations.
+            </p>
           </div>
 
-          <PlanPanel plan={plan} />
+          <div className="p-4">
+            <PlanPanel plan={plan} />
+          </div>
         </section>
       </main>
 
-      <footer className="mx-auto max-w-6xl px-4 pb-8 text-xs text-white/40">
-        Prototype UI • Tailwind enabled • Safe foundation for animations and richer components later.
+      <footer className="mx-auto max-w-6xl px-4 pb-10 text-xs text-slate-500 dark:text-white/40">
+        Prototype UI • Light/Dark mode • Hackathon-ready foundation.
       </footer>
     </div>
   );
