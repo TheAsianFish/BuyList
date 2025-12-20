@@ -9,17 +9,17 @@ function currency(n, ccy = "USD") {
 export default function PlanPanel({ plan }) {
     if (!plan) {
         return (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <div className="text-sm font-medium text-slate-900">Waiting for input</div>
-                <div className="text-xs text-slate-600 mt-2">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-white/10 dark:bg-black/20">
+                <div className="text-sm font-medium text-slate-900 dark:text-white">Waiting for input</div>
+                <div className="text-xs text-slate-600 mt-2 dark:text-white/60">
                     Send a request on the left to generate a mock multi-store plan.
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <Hint text='“Bake a cake”' />
-                    <Hint text='“Tacos for 4”' />
-                    <Hint text='“Meal prep chicken + rice”' />
-                    <Hint text='“High-protein smoothie”' />
+                    <Hint text='"Bake a cake"' />
+                    <Hint text='"Tacos for 4"' />
+                    <Hint text='"Meal prep chicken + rice"' />
+                    <Hint text='"High-protein smoothie"' />
                 </div>
             </div>
         );
@@ -30,12 +30,12 @@ export default function PlanPanel({ plan }) {
     return (
         <div className="space-y-4">
             {/* Summary */}
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <div className="text-sm font-semibold">{plan.dish}</div>
-                <div className="text-xs text-slate-600 mt-1">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-white/10 dark:bg-black/20">
+                <div className="text-sm font-semibold dark:text-white">{plan.dish}</div>
+                <div className="text-xs text-slate-600 mt-1 dark:text-white/60">
                     {plan.servings ? `${plan.servings} • ` : ""}
                     {plan.summary?.storesUsed ?? 0} store(s) • Est. total{" "}
-                    <span className="text-slate-900 font-semibold">
+                    <span className="text-slate-900 font-semibold dark:text-white">
                         {currency(plan.summary?.estimatedTotal ?? 0, ccy)}
                     </span>
                 </div>
@@ -44,11 +44,11 @@ export default function PlanPanel({ plan }) {
             {/* Stores */}
             <div className="space-y-3">
                 {(plan.stores || []).map((s) => (
-                    <div key={s.name} className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <div key={s.name} className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
                         <div className="flex items-start justify-between gap-3">
                             <div>
-                                <div className="text-sm font-semibold">{s.name}</div>
-                                <div className="text-xs text-slate-600 mt-1">
+                                <div className="text-sm font-semibold dark:text-white">{s.name}</div>
+                                <div className="text-xs text-slate-600 mt-1 dark:text-white/60">
                                     {s.distanceMiles} mi • {s.items?.length || 0} items
                                 </div>
                             </div>
@@ -58,13 +58,13 @@ export default function PlanPanel({ plan }) {
                             {(s.items || []).map((it, idx) => (
                                 <div
                                     key={idx}
-                                    className="rounded-xl border border-slate-200 bg-slate-50 p-3 flex items-start justify-between gap-3"
+                                    className="rounded-xl border border-slate-200 bg-slate-50 p-3 flex items-start justify-between gap-3 dark:border-white/10 dark:bg-black/20"
                                 >
                                     <div className="min-w-0">
-                                        <div className="text-sm font-medium truncate">{it.ingredient}</div>
-                                        <div className="text-xs text-slate-600 mt-1 truncate">{it.qty}</div>
+                                        <div className="text-sm font-medium truncate dark:text-white">{it.ingredient}</div>
+                                        <div className="text-xs text-slate-600 mt-1 truncate dark:text-white/60">{it.qty}</div>
                                     </div>
-                                    <div className="text-sm font-semibold shrink-0">
+                                    <div className="text-sm font-semibold shrink-0 dark:text-white">
                                         {currency(it.price || 0, ccy)}
                                     </div>
                                 </div>
@@ -76,13 +76,13 @@ export default function PlanPanel({ plan }) {
 
             {/* Missing */}
             {plan.missing?.length > 0 && (
-                <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-                    <div className="text-sm font-semibold text-rose-800">Missing</div>
+                <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-500/30 dark:bg-rose-500/10">
+                    <div className="text-sm font-semibold text-rose-800 dark:text-rose-300">Missing</div>
                     <div className="mt-2 space-y-2">
                         {plan.missing.map((m, idx) => (
-                            <div key={idx} className="rounded-xl border border-rose-200 bg-white p-3">
-                                <div className="text-sm font-medium text-rose-900">{m.ingredient}</div>
-                                <div className="text-xs text-rose-700 mt-1">{m.qty}</div>
+                            <div key={idx} className="rounded-xl border border-rose-200 bg-white p-3 dark:border-rose-500/30 dark:bg-white/5">
+                                <div className="text-sm font-medium text-rose-900 dark:text-rose-300">{m.ingredient}</div>
+                                <div className="text-xs text-rose-700 mt-1 dark:text-rose-400">{m.qty}</div>
                             </div>
                         ))}
                     </div>
@@ -90,7 +90,7 @@ export default function PlanPanel({ plan }) {
             )}
 
             {/* Disclaimer */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600 dark:border-white/10 dark:bg-black/20 dark:text-white/60">
                 {plan.disclaimer || "Demo disclaimer goes here."}
             </div>
         </div>
@@ -99,7 +99,7 @@ export default function PlanPanel({ plan }) {
 
 function Hint({ text }) {
     return (
-        <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700">
+        <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-white/80">
             {text}
         </div>
     );

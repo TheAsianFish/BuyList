@@ -20,15 +20,15 @@ export default function ThemeToggle({ theme, onToggle }) {
             {/* Switch track */}
             <span
                 className={[
-                    "relative inline-flex h-5 w-10 items-center rounded-full transition",
+                    "relative inline-flex h-5 w-10 items-center rounded-full transition-colors px-0.5",
                     isDark ? "bg-indigo-500" : "bg-slate-300",
                 ].join(" ")}
             >
                 {/* Switch thumb */}
                 <span
                     className={[
-                        "inline-block h-4 w-4 transform rounded-full bg-white transition",
-                        isDark ? "translate-x-5" : "translate-x-1",
+                        "inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm",
+                        isDark ? "translate-x-5" : "translate-x-0",
                     ].join(" ")}
                 />
             </span>
