@@ -51,10 +51,7 @@ export default function App() {
   /* ------------------ Theme state ------------------ */
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem("theme");
-    if (saved === "dark" || saved === "light") return saved;
-    return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches
-      ? "dark"
-      : "light";
+    return saved === "dark" || saved === "light" ? saved : "light";
   });
 
   useEffect(() => {

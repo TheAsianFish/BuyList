@@ -1,3 +1,4 @@
+// src/components/ThemeToggle.jsx
 export default function ThemeToggle({ theme, onToggle }) {
     const isDark = theme === "dark";
 
