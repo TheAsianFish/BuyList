@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import ThemeToggle from "./components/ThemeToggle";
+import { useMemo, useState } from "react";
 import ChatPanel from "./components/ChatPanel";
 import PlanPanel from "./components/PlanPanel";
 
@@ -48,24 +47,6 @@ export default function App() {
   const [status, setStatus] = useState("idle"); // idle | loading | done | error
   const [plan, setPlan] = useState(null);
 
-  /* ------------------ Theme state ------------------ */
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    return saved === "dark" || saved === "light" ? saved : "light";
-  });
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  function toggleTheme() {
-    setTheme((t) => (t === "dark" ? "light" : "dark"));
-  }
-  /* ------------------------------------------------- */
-
   const canSend = input.trim().length > 0 && status !== "loading";
 
   const statusLabel = useMemo(() => {
@@ -104,27 +85,13 @@ export default function App() {
   }
 
   return (
-    <div
-      className="
-        min-h-screen w-full
-        bg-gradient-to-b from-slate-50 via-white to-slate-50
-        text-slate-900
-        dark:from-[#070A12] dark:via-[#0B1020] dark:to-[#070A12]
-        dark:text-white
-      "
-    >
+    <div className="min-h-screen w-full bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900">
       {/* Top bar */}
-      <header
-        className="
-          sticky top-0 z-20 border-b
-          border-slate-200/70 bg-white/70 backdrop-blur
-          dark:border-white/10 dark:bg-black/40
-        "
-      >
+      <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/70 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <h1 className="text-lg font-semibold tracking-tight">BuyList</h1>
-            <p className="text-xs text-slate-600 mt-1 dark:text-white/60">
+            <p className="text-xs text-slate-600 mt-1">
               LLM decides ingredients once • backend picks stores deterministically
             </p>
           </div>
@@ -134,34 +101,26 @@ export default function App() {
               className={[
                 "text-xs px-2.5 py-1 rounded-full border",
                 status === "loading"
-                  ? "border-indigo-300 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300"
+                  ? "border-indigo-300 bg-indigo-50 text-indigo-700"
                   : status === "done"
-                    ? "border-emerald-300 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-700"
                     : status === "error"
-                      ? "border-rose-300 bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300"
-                      : "border-slate-200 bg-slate-50 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60",
+                      ? "border-rose-300 bg-rose-50 text-rose-700"
+                      : "border-slate-200 bg-slate-50 text-slate-600",
               ].join(" ")}
             >
               {statusLabel}
             </span>
-
-            <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Chat */}
-        <section
-          className="
-            lg:col-span-5 rounded-2xl border
-            border-slate-200 bg-white shadow-sm
-            dark:border-white/10 dark:bg-white/5
-          "
-        >
-          <div className="p-4 border-b border-slate-100 dark:border-white/10">
+        <section className="lg:col-span-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="p-4 border-b border-slate-100">
             <h2 className="text-sm font-semibold">Chat</h2>
-            <p className="text-xs text-slate-600 mt-1 dark:text-white/60">
+            <p className="text-xs text-slate-600 mt-1">
               Type a dish request. We’ll mock the response for now.
             </p>
           </div>
@@ -170,7 +129,7 @@ export default function App() {
             <ChatPanel messages={messages} />
 
             <div className="mt-4">
-              <label className="block text-xs text-slate-600 mb-2 dark:text-white/60">
+              <label className="block text-xs text-slate-600 mb-2">
                 Request (chatbot input)
               </label>
 
@@ -186,8 +145,6 @@ export default function App() {
                   w-full rounded-xl px-3 py-3 text-sm outline-none resize-none
                   bg-white border border-slate-200
                   focus:border-indigo-300 focus:ring-4 focus:ring-indigo-200/50
-                  dark:bg-black/30 dark:border-white/10 dark:text-white
-                  dark:focus:border-indigo-400/60 dark:focus:ring-indigo-500/10
                 "
                 onKeyDown={(e) => {
                   if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
@@ -198,9 +155,7 @@ export default function App() {
               />
 
               <div className="mt-2 flex items-center justify-between">
-                <p className="text-xs text-slate-500 dark:text-white/50">
-                  Ctrl/⌘ + Enter to send
-                </p>
+                <p className="text-xs text-slate-500">Ctrl/⌘ + Enter to send</p>
                 <button
                   onClick={handleSend}
                   disabled={!canSend}
@@ -218,16 +173,10 @@ export default function App() {
         </section>
 
         {/* Plan */}
-        <section
-          className="
-            lg:col-span-7 rounded-2xl border
-            border-slate-200 bg-white shadow-sm
-            dark:border-white/10 dark:bg-white/5
-          "
-        >
-          <div className="p-4 border-b border-slate-100 dark:border-white/10">
+        <section className="lg:col-span-7 rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="p-4 border-b border-slate-100">
             <h2 className="text-sm font-semibold">Plan Output</h2>
-            <p className="text-xs text-slate-600 mt-1 dark:text-white/60">
+            <p className="text-xs text-slate-600 mt-1">
               Later: store cards, missing items, totals, export, and animations.
             </p>
           </div>
@@ -238,8 +187,8 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="mx-auto max-w-6xl px-4 pb-10 text-xs text-slate-500 dark:text-white/40">
-        Prototype UI • Light/Dark mode • Hackathon-ready foundation.
+      <footer className="mx-auto max-w-6xl px-4 pb-10 text-xs text-slate-500">
+        Prototype UI • Light-only mode (no theme toggle).
       </footer>
     </div>
   );
